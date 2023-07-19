@@ -1,0 +1,3 @@
+[submodule "plasticity-bin"]
+	path = plasticity-bin
+	url = ssh://aur@aur.archlinux.org/plasticity-bin.git
