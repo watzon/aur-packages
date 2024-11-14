@@ -1,0 +1,109 @@
+name: Build windsurf
+
+on:
+  push:
+    paths:
+      - 'packages/windsurf/**'
+  pull_request:
+    paths:
+      - 'packages/windsurf/**'
+  schedule:
+    - cron: '0 */6 * * *'  # Run every 6 hours
+  workflow_dispatch:
+    inputs:
+      force_build:
+        description: 'Force build even if no changes'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      version_changed: ${{ steps.check-version.outputs.changed }}
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Get latest version
+        id: get-version
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https curl gnupg
+          version=$(./scripts/check-windsurf-version.sh)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Check if version changed
+        id: check-version
+        run: |
+          current_version=$(grep -oP 'pkgver=\K.*' packages/windsurf/PKGBUILD)
+          new_version="${{ steps.get-version.outputs.version }}"
+          if [ "$current_version" != "$new_version" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    needs: check-version
+    if: |
+      needs.check-version.outputs.version_changed == 'true' ||
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' ||
+      inputs.force_build == true
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update PKGBUILD version
+        if: needs.check-version.outputs.version_changed == 'true'
+        run: |
+          sed -i "s/^pkgver=.*/pkgver=${{ needs.check-version.outputs.version }}/" packages/windsurf/PKGBUILD
+          sed -i "s/^pkgrel=.*/pkgrel=1/" packages/windsurf/PKGBUILD
+
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm git namcap libarchive curl
+
+      - name: Build package
+        working-directory: packages/windsurf
+        run: |
+          # Create build user
+          useradd -m builder
+          chown -R builder:builder .
+          
+          # Build package as non-root user
+          su builder -c 'makepkg -s --noconfirm'
+
+      - name: Run namcap checks
+        working-directory: packages/windsurf
+        run: |
+          namcap PKGBUILD
+          find . -name "*.pkg.tar.zst" -exec namcap {} \;
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: windsurf-package
+          path: packages/windsurf/*.pkg.tar.zst
+          if-no-files-found: error
+
+      - name: Create Pull Request
+        if: needs.check-version.outputs.version_changed == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: 'Update windsurf to ${{ needs.check-version.outputs.version }}'
+          commit-message: 'Update windsurf to ${{ needs.check-version.outputs.version }}'
+          branch: 'update-windsurf-${{ needs.check-version.outputs.version }}'
+          delete-branch: true
+          body: |
+            Updates windsurf package to version ${{ needs.check-version.outputs.version }}.
+            
+            Changes:
+            - Updated pkgver to ${{ needs.check-version.outputs.version }}
+            - Reset pkgrel to 1

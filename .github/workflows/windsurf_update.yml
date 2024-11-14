@@ -1,0 +1,32 @@
+name: Update Windsurf AUR Package
+
+on:
+  push:
+    paths:
+      - 'packages/windsurf/PKGBUILD'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  aur-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get version from PKGBUILD
+        id: get-version
+        run: |
+          version=$(grep -oP 'pkgver=\K.*' packages/windsurf/PKGBUILD)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Publish AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+        with:
+          pkgname: windsurf
+          pkgbuild: packages/windsurf/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update to version ${{ steps.get-version.outputs.version }}"
+          allow_empty_commits: false
