@@ -36,8 +36,8 @@ source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/
 sha256sums=('SKIP')
 
 package() {
-    # Extract package data
-    bsdtar -xf data.tar.xz -C "${pkgdir}"
+    # Extract package data using the new zst archive
+    bsdtar -xf data.tar.zst -C "${pkgdir}"
 
     # Fix permissions
     chmod 4755 "${pkgdir}/usr/share/windsurf/chrome-sandbox"
