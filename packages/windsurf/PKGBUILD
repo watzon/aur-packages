@@ -71,7 +71,7 @@ source=(
 sha256sums=(
     $_deb_sha256
     '5c54ecf084dbaee5d85036205c2bb2df0d9b2bf77a503d722ee9833e4a236d7a'
-    '31a4e5539c27c4aa8de6341e22fb7dbb3c22e01e213aaf345b4729664f579426'
+    '5288e6a845852d5fc1c6045da57d5b973bd24eda866d4222a8cee41ffb0c6041'
 )
 
 prepare() {
@@ -81,13 +81,13 @@ prepare() {
 }
 
 package() {    
+
     # Install main binaries
     install -d "${pkgdir}/usr/share/${_pkgname}"
-    ls "${srcdir}/${_pkgname}-latest/"
-    cp -r "${srcdir}/${_pkgname}-latest/"* "${pkgdir}/usr/share/${_pkgname}/"
+    cp -r "${srcdir}/deb_file/data/usr/share/${_pkgname}" "${pkgdir}/usr/share/"
 
     # Fix chrome-sandbox permissions
-    chmod 4755 "${pkgdir}/usr/share/windsurf/chrome-sandbox"
+    chmod 4755 "${pkgdir}/usr/share/${_pkgname}/chrome-sandbox"
 
     # Install binary launcher script
     install -d "${pkgdir}/usr/bin"
