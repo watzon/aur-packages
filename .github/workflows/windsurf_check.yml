@@ -35,9 +35,11 @@ jobs:
         id: get_version
         run: |
           chmod +x ./scripts/check-windsurf-version.sh
-          OUTPUT=$(./scripts/check-windsurf-version.sh)
+          # For testing, use the --test parameter. Remove this parameter for production.
+          OUTPUT=$(./scripts/check-windsurf-version.sh --test)
           VERSION=$(echo "$OUTPUT" | cut -d' ' -f1)
           SHA256SUM=$(echo "$OUTPUT" | cut -d' ' -f2)
+          echo "Using test version: $VERSION with SHA256: $SHA256SUM"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "sha256sum=$SHA256SUM" >> $GITHUB_OUTPUT
 

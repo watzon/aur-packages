@@ -22,6 +22,12 @@ echo "deb [signed-by=/usr/share/keyrings/windsurf-archive-keyring.gpg arch=amd64
 # Update package lists for the repository
 sudo apt-get update > /dev/null 2>&1
 
+if [ "$1" = "--test" ]; then
+    # Mock version and SHA256 sum for testing
+    printf "99.99.99 abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+    exit 0
+fi
+
 # Get package version
 VERSION=$(sudo apt-cache madison windsurf | head -n1 | awk '{ print $3 }' | cut -d'-' -f1)
 
