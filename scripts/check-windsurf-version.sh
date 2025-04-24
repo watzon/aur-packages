@@ -29,9 +29,18 @@ if [ -n "$VERSION" ]; then
     # Verify that the deb file exists
     DEB_URL="https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${VERSION}.deb"
     if curl --output /dev/null --silent --head --fail "$DEB_URL"; then
-        # Output only the version number, nothing else
-        printf "%s" "$VERSION"
-        exit 0
+        # Download the DEB file to calculate SHA256 sum
+        DEB_FILE="$TEMP_DIR/Windsurf-linux-x64-${VERSION}.deb"
+        if curl --silent --output "$DEB_FILE" "$DEB_URL"; then
+            # Calculate SHA256 sum
+            SHA256SUM=$(sha256sum "$DEB_FILE" | awk '{print $1}')
+            # Output version and SHA256 sum
+            printf "%s %s" "$VERSION" "$SHA256SUM"
+            exit 0
+        else
+            echo "Failed to download DEB package from $DEB_URL" >&2
+            exit 1
+        fi
     else
         echo "Deb package not found at $DEB_URL" >&2
         exit 1

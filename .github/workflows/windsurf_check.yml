@@ -20,6 +20,7 @@ jobs:
     outputs:
       changed: ${{ steps.check_version.outputs.changed }}
       version: ${{ steps.get_version.outputs.version }}
+      sha256sum: ${{ steps.get_version.outputs.sha256sum }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -34,8 +35,11 @@ jobs:
         id: get_version
         run: |
           chmod +x ./scripts/check-windsurf-version.sh
-          VERSION=$(./scripts/check-windsurf-version.sh)
+          OUTPUT=$(./scripts/check-windsurf-version.sh)
+          VERSION=$(echo "$OUTPUT" | cut -d' ' -f1)
+          SHA256SUM=$(echo "$OUTPUT" | cut -d' ' -f2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "sha256sum=$SHA256SUM" >> $GITHUB_OUTPUT
 
       - name: Check if version changed
         id: check_version
@@ -68,7 +72,9 @@ jobs:
           sed -i "s/pkgver=.*/pkgver=$VERSION/" packages/windsurf/PKGBUILD
           # Reset pkgrel to 1 since this is a new version
           sed -i "s/pkgrel=.*/pkgrel=1/" packages/windsurf/PKGBUILD
-
+          # Update checksums
+          SHA256SUM="${{ needs.check-version.outputs.sha256sum }}"
+          sed -i "s/sha256sums=.*/sha256sums=('$SHA256SUM')/" packages/windsurf/PKGBUILD
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
