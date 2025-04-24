@@ -77,6 +77,8 @@ jobs:
           # Update checksums
           SHA256SUM="${{ needs.check-version.outputs.sha256sum }}"
           sed -i "s/sha256sums=.*/sha256sums=('$SHA256SUM')/" packages/windsurf/PKGBUILD
+          # Test
+          cat packages/windsurf/PKGBUILD 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
