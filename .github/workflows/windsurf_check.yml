@@ -35,11 +35,9 @@ jobs:
         id: get_version
         run: |
           chmod +x ./scripts/check-windsurf-version.sh
-          # For testing, use the --test parameter. Remove this parameter for production.
-          OUTPUT=$(./scripts/check-windsurf-version.sh --test)
+          OUTPUT=$(./scripts/check-windsurf-version.sh)
           VERSION=$(echo "$OUTPUT" | cut -d' ' -f1)
           SHA256SUM=$(echo "$OUTPUT" | cut -d' ' -f2)
-          echo "Using test version: $VERSION with SHA256: $SHA256SUM"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "sha256sum=$SHA256SUM" >> $GITHUB_OUTPUT
 
@@ -48,9 +46,6 @@ jobs:
         run: |
           CURRENT_VERSION=$(grep -oP 'pkgver=\K[^"]+' packages/windsurf/PKGBUILD)
           NEW_VERSION="${{ steps.get_version.outputs.version }}"
-          echo "Current version: $CURRENT_VERSION"
-          echo "New version: $NEW_VERSION"
-          
           if [ "$CURRENT_VERSION" != "$NEW_VERSION" ] || [ "${{ github.event.inputs.force }}" == "true" ]; then
             echo "Version changed!"
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -77,8 +72,6 @@ jobs:
           # Update checksums
           SHA256SUM="${{ needs.check-version.outputs.sha256sum }}"
           sed -i "/sha256sums=(/,/)/c\sha256sums=('$SHA256SUM')" packages/windsurf/PKGBUILD
-          # Test
-          cat packages/windsurf/PKGBUILD 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
