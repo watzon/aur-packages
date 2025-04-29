@@ -71,7 +71,7 @@ jobs:
           sed -i "s/pkgrel=.*/pkgrel=1/" packages/windsurf/PKGBUILD
           # Update checksums
           SHA256SUM="${{ needs.check-version.outputs.sha256sum }}"
-          sed -i "/sha256sums=(/,/)/c\sha256sums=('$SHA256SUM')" packages/windsurf/PKGBUILD
+          sed -i "s|^sha256sums=('.*')\$|sha256sums=('$SHA256SUM')|" packages/windsurf/PKGBUILD
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
