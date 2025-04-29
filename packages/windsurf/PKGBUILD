@@ -62,6 +62,7 @@ package() {
     echo "#!/bin/sh" > run.sh
     echo "/usr/bin/${_elbin} /opt/${pkgname}-runtime \$@" >> run.sh
     install -Dm755 run.sh "${pkgdir}/usr/bin/${pkgname}"
+    install -Dm755 run.sh "${pkgdir}/usr/share/${pkgname}/${pkgname}"
 
     # Install desktop entries for application and URL handling
     mv usr/share/applications "${pkgdir}/usr/share/applications"
