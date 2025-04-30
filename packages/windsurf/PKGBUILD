@@ -1,20 +1,18 @@
 # Maintainer: Chris Watson <cawatson1993@gmail.com>
 
-_elbin=electron34 # should be taken from $(grep -E '"electron": "[0-9]{2}' package.json|awk '{print $2}'|cut -c2-3)
 pkgname=windsurf
 pkgver=1.7.3
-pkgrel=1
+pkgrel=2
 pkgdesc="The new purpose-built IDE to harness magic"
 arch=('x86_64')
 url="https://windsurf.com/"
 license=('custom') # should be fixed
-depends=( # traslative deps by electron could be removed
+depends=( # electron is added at build time. Traslative deps by electron could be removed
     'alsa-lib'
     'bash'
     'cairo'
     'dbus'
     'expat'
-    ${_elbin}
     'fontconfig'
     'gcc-libs'
     'glibc'
@@ -50,9 +48,11 @@ options=('!strip') # About 0.1MB strippable.
 # Is .sig file avaiable?
 source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${pkgver}.deb")
 sha256sums=('0d1bf6aaf7145383d366d87ae4926a74b5ee6b025b2e0e159a098111806dbcc5')
-
 package() {
     bsdtar -xf "data.tar.xz"
+    # Get version of internal electron
+    _elbin=electron$(grep -E '"electron": "[0-9]{2}' usr/share/"${pkgname}"/resources/app/package.json|awk '{print $2}'|cut -c2-3)
+    depends+=($_elbin)
     # Main resources
     install -d "${pkgdir}/usr/share/${pkgname}/resources/"
     mv "usr/share/${pkgname}/resources/app" "${pkgdir}/usr/share/${pkgname}/resources/app"
