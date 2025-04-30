@@ -44,7 +44,8 @@ depends=(
 optdepends=('glib2: Needed for move to trash functionality'
             'org.freedesktop.secrets: Needed for settings sync'
             'libdbusmenu-glib: Needed for KDE global menu'
-            'icu69: Needed for live share')
+            'icu69: Needed for live share'
+            'vulkan-driver')
 
 options=('!strip') #done?
 
@@ -55,14 +56,14 @@ sha256sums=('4742fe6a4591572faf75ec0668d0fedf22b3eeff6a9f344372d9edeede3057f5')
 package() {
     bsdtar -xf "data.tar.xz"
     # Install main resources
-    install -d "${pkgdir}/opt"
-    mv "usr/share/${pkgname}/resources/app" "${pkgdir}/opt/${pkgname}-runtime"
+    install -d "${pkgdir}/usr/share/${pkgname}/resources"
+    mv "usr/share/${pkgname}/resources/app" "${pkgdir}/usr/share/${pkgname}/resources/app"
 
     # Create launcher
     echo "#!/bin/sh" > run.sh
-    echo "/usr/bin/${_elbin} /opt/${pkgname}-runtime \$@" >> run.sh
+    echo "/usr/bin/${_elbin} /usr/share/${pkgname}/resources/app \$@" >> run.sh
     install -Dm755 run.sh "${pkgdir}/usr/bin/${pkgname}"
-    install -Dm755 run.sh "${pkgdir}/usr/share/${pkgname}/${pkgname}"
+    ln -sf "/usr/bin/windsurf" "${pkgdir}/usr/share/${pkgname}/${pkgname}"
 
     # Install desktop entries for application and URL handling
     mv usr/share/applications "${pkgdir}/usr/share/applications"
@@ -73,7 +74,7 @@ package() {
     # KDE/GTK never look in 1024-px dirs; install dummy aliases too
     for _size in 128 256 1024; do
     	install -d "${pkgdir}/usr/share/icons/hicolor/${_size}x${_size}/apps"
-    	ln -s "/opt/${pkgname}-runtime/resources/linux/code.png" "${pkgdir}/usr/share/icons/hicolor/${_size}x${_size}/apps/${pkgname}.png"
+    	ln -s "/usr/share/${pkgname}/resources/app/resources/linux/code.png" "${pkgdir}/usr/share/icons/hicolor/${_size}x${_size}/apps/${pkgname}.png"
 	done
     # Shell completions
     mv "usr/share/bash-completion" "${pkgdir}/usr/share/bash-completion"
