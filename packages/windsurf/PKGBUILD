@@ -71,11 +71,9 @@ package() {
     install -Dm644 "usr/share/appdata/${pkgname}.appdata.xml" "${pkgdir}/usr/share/metainfo/com.codeium.${pkgname}.metainfo.xml"
     install -Dm644 "usr/share/mime/packages/${pkgname}-workspace.xml" "${pkgdir}/usr/share/mime/packages/${pkgname}-workspace.xml"
 
-    # KDE/GTK never look in 1024-px dirs; install dummy aliases too
-    for _size in 128 256 1024; do
-    	install -d "${pkgdir}/usr/share/icons/hicolor/${_size}x${_size}/apps"
-    	ln -s "/usr/share/${pkgname}/resources/app/resources/linux/code.png" "${pkgdir}/usr/share/icons/hicolor/${_size}x${_size}/apps/${pkgname}.png"
-	done
+    # KDE/GTK never look in 1024-px dirs;
+    install -d "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}"
+    ln -s "/usr/share/${pkgname}/resources/app/out/media/code-icon.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
     # Shell completions
     mv "usr/share/bash-completion" "${pkgdir}/usr/share/bash-completion"
     install -Dm644 "usr/share/zsh/vendor-completions/_${pkgname}" "${pkgdir}/usr/share/zsh/site-functions/_${pkgname}"
