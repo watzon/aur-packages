@@ -1,9 +1,9 @@
 # Maintainer: Chris Watson <cawatson1993@gmail.com>
 
 pkgname=windsurf
-pkgver=1.7.2
+pkgver=1.7.3
 _elbin=electron34 #see package.json
-pkgrel=3
+pkgrel=1
 pkgdesc="The new purpose-built IDE to harness magic"
 arch=('x86_64')
 url="https://windsurf.com/"
