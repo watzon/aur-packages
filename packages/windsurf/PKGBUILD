@@ -2,7 +2,7 @@
 
 pkgname=windsurf
 pkgver=1.7.3
-_elbin=electron34 # should be taken from package.json
+_elbin=electron34 # should be taken from $(grep -E '"electron": "[0-9]{2}' package.json|awk '{print $2}'|cut -c2-3)
 pkgrel=2
 pkgdesc="The new purpose-built IDE to harness magic"
 arch=('x86_64')
