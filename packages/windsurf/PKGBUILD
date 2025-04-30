@@ -60,8 +60,7 @@ package() {
     mv "usr/share/${pkgname}/resources/app" "${pkgdir}/usr/share/${pkgname}/resources/app"
 
     # Create launcher
-    echo "#!/bin/sh" > run.sh
-    echo "/usr/bin/${_elbin} /usr/share/${pkgname}/resources/app \$@" >> run.sh
+    echo -e "#!/bin/sh\nexec ${_elbin} /usr/share/${pkgname}/resources/app \$@" > run.sh
     install -Dm755 run.sh "${pkgdir}/usr/bin/${pkgname}"
     ln -sf "/usr/bin/windsurf" "${pkgdir}/usr/share/${pkgname}/${pkgname}"
 
