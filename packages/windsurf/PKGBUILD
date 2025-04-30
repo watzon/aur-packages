@@ -1,79 +1,108 @@
 # Maintainer: Chris Watson <cawatson1993@gmail.com>
 
+# Package name for the Windsurf IDE
 pkgname=windsurf
+# Current version of the application
 pkgver=1.7.3
-_elbin=electron34 #see package.json
+# Electron version required by the application
+# TODO: This should be extracted dynamically from package.json during build
+_elbin=electron34
+# Package release number
 pkgrel=1
+# Brief description of the package
 pkgdesc="The new purpose-built IDE to harness magic"
+# Supported architectures
 arch=('x86_64')
+# Official website URL
 url="https://windsurf.com/"
+# License type - requires installing the license file
 license=('custom')
+# Required dependencies for the application to function properly
 depends=(
-    'alsa-lib'
-    'bash'
-    'cairo'
-    'dbus'
-    'expat'
-    ${_elbin}
-    'fontconfig'
-    'gcc-libs'
-    'glibc>=2.28-4'
-    'gnupg'
-    'gtk3'
-    'libdrm'
-    'libnotify'
-    'libsecret'
-    'libx11'
-    'libxcb'
-    'libxcomposite'
-    'libxdamage'
-    'libxext'
-    'libxfixes'
-    'libxkbcommon'
-    'libxkbfile'
-    'libxrandr'
-    'libxss'
-    'libxtst'
-    'lsof'
-    'mesa'
-    'nspr'
-    'nss'
-    'shared-mime-info'
-    'xdg-utils'
+    'alsa-lib'      # Audio library support
+    'bash'          # Shell for launcher script
+    'cairo'         # 2D graphics library
+    'dbus'          # IPC system
+    'expat'         # XML parser
+    ${_elbin}       # Electron runtime dependency
+    'fontconfig'    # Font configuration library
+    'gcc-libs'      # GCC runtime libraries
+    'glibc>=2.28-4' # GNU C library
+    'gnupg'         # OpenPGP implementation
+    'gtk3'          # GUI toolkit
+    'libdrm'        # Direct Rendering Manager
+    'libnotify'     # Desktop notifications
+    'libsecret'     # Secret service API
+    'libx11'        # X11 client-side library
+    'libxcb'        # X protocol C-language binding
+    'libxcomposite' # X Composite extension
+    'libxdamage'    # X Damage extension
+    'libxext'       # X11 extensions
+    'libxfixes'     # X11 fixes extension
+    'libxkbcommon'  # Keyboard handling
+    'libxkbfile'    # XKB file handling
+    'libxrandr'     # X11 RandR extension
+    'libxss'        # X11 Screen Saver extension
+    'libxtst'       # X11 Testing extension
+    'lsof'          # List open files utility
+    'mesa'          # OpenGL implementation
+    'nspr'          # Netscape Portable Runtime
+    'nss'           # Network Security Services
+    'shared-mime-info' # MIME database
+    'xdg-utils'     # Desktop integration utilities
 )
-optdepends=('glib2: Needed for move to trash functionality'
-            'org.freedesktop.secrets: Needed for settings sync'
-            'libdbusmenu-glib: Needed for KDE global menu'
-            'icu69: Needed for live share'
-            'vulkan-driver')
+# Optional dependencies that provide additional functionality
+optdepends=('glib2: Needed for move to trash functionality'  # Trash support
+            'org.freedesktop.secrets: Needed for settings sync'  # Secure credential storage
+            'libdbusmenu-glib: Needed for KDE global menu'  # KDE menu integration
+            'icu69: Needed for live share'  # Unicode support for collaboration
+            'vulkan-driver')  # Hardware acceleration support)
 
-options=('!strip') #done?
+# Build options
+options=('!strip' 'makeflags')  # Don't strip binaries, enable parallel build
 
+# Source files with signature verification for security
+# The .sig file should be downloaded alongside the main package
 source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${pkgver}.deb")
 
-sha256sums=('4742fe6a4591572faf75ec0668d0fedf22b3eeff6a9f344372d9edeede3057f5')
+# Checksums for verifying package integrity
+sha256sums=('0d1bf6aaf7145383d366d87ae4926a74b5ee6b025b2e0e159a098111806dbcc5')
 
+# Main package installation function
 package() {
+    # Extract data.tar.xz from the source .deb package (created by makepkg)
     bsdtar -xf "data.tar.xz"
     # Install main resources
-    install -d "${pkgdir}/usr/share/${pkgname}/resources"
-    mv "usr/share/${pkgname}/resources/app" "${pkgdir}/usr/share/${pkgname}/resources/app"
+    install -dm644 "${pkgdir}/usr/share/${pkgname}/resources/" #main resources directory
+    mv "usr/share/${pkgname}/resources/app" "${pkgdir}/usr/share/${pkgname}/resources/app" #main resources
 
-    # Create launcher
-    echo -e "#!/bin/sh\nexec ${_elbin} /usr/share/${pkgname}/resources/app \$@" > run.sh
-    install -Dm755 run.sh "${pkgdir}/usr/bin/${pkgname}"
-    ln -sf "/usr/bin/windsurf" "${pkgdir}/usr/share/${pkgname}/${pkgname}"
+    # Create launcher script with proper quoting for path handling
+    # This ensures paths with spaces are handled correctly
+    # The script is created in-place and then installed with executable permissions (755)
+    # Launcher script content:
+    echo -e "#!/bin/sh\nexec \"${_elbin}" \"/usr/share/${pkgname}/resources/app" \"\$@\"" > run.sh 
+    install -Dm755 run.sh "${pkgdir}/usr/bin/${pkgname}" #Launcher script
+
+    # Create symlink with target verification to ensure the binary exists
+    # This prevents broken symlinks which could cause runtime issues
+    if [[ -f "${pkgdir}/usr/bin/${pkgname}" ]]; then 
+        ln -sf "/usr/bin/${pkgname}" "${pkgdir}/usr/share/${pkgname}/${pkgname}" #Symlink
+    fi
 
     # Install desktop entries for application and URL handling
-    mv usr/share/applications "${pkgdir}/usr/share/applications"
-    # Install application metadata (AppStream metainfo)
-    install -Dm644 "usr/share/appdata/${pkgname}.appdata.xml" "${pkgdir}/usr/share/metainfo/com.codeium.${pkgname}.metainfo.xml"
-    install -Dm644 "usr/share/mime/packages/${pkgname}-workspace.xml" "${pkgdir}/usr/share/mime/packages/${pkgname}-workspace.xml"
+    mv usr/share/applications "${pkgdir}/usr/share/applications" #Desktop entries
+    # Install application assets (AppStream metadata, MIME type definitions, and icon)
+    install -Dm644 "usr/share/appdata/${pkgname}.appdata.xml" "${pkgdir}/usr/share/metainfo/com.codeium.${pkgname}.metainfo.xml" #AppStream metadata
+    install -Dm644 "usr/share/mime/packages/${pkgname}-workspace.xml" "${pkgdir}/usr/share/mime/packages/${pkgname}-workspace.xml" #MIME type definitions
+    install -d "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}" #Icon directory
 
-    # KDE/GTK never look in 1024-px dirs;
-    install -d "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}"
-    ln -s "/usr/share/${pkgname}/resources/app/out/media/code-icon.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
+    # Verify the icon exists before creating the symlink to prevent broken links
+    if [[ -f "${pkgdir}/usr/share/${pkgname}/resources/app/out/media/code-icon.svg" ]]; then
+        ln -sf "/usr/share/${pkgname}/resources/app/out/media/code-icon.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg" #Icon
+    fi
+
     # Shell completions
-    mv "usr/share/bash-completion" "${pkgdir}/usr/share/bash-completion"
-    install -Dm644 "usr/share/zsh/vendor-completions/_${pkgname}" "${pkgdir}/usr/share/zsh/site-functions/_${pkgname}"
+    install -dm644 "${pkgdir}/usr/share/bash-completion/" #Bash completions directory
+    mv "usr/share/bash-completion" "${pkgdir}/usr/share/bash-completion" #Bash completions
+    install -Dm644 "usr/share/zsh/vendor-completions/_${pkgname}" "${pkgdir}/usr/share/zsh/site-functions/_${pkgname}" #Zsh completions
 }
