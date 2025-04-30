@@ -80,7 +80,7 @@ package() {
     # This ensures paths with spaces are handled correctly
     # The script is created in-place and then installed with executable permissions (755)
     # Launcher script content:
-    echo -e "#!/bin/sh\nexec \"${_elbin}" \"/usr/share/${pkgname}/resources/app" \"\$@\"" > run.sh 
+    echo -e "#!/bin/sh\nexec \"${_elbin}\" \"/usr/share/${pkgname}/resources/app\" \"\$@\"" > run.sh
     install -Dm755 run.sh "${pkgdir}/usr/bin/${pkgname}" #Launcher script
 
     # Create symlink with target verification to ensure the binary exists
