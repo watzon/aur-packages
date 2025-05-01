@@ -1,0 +1,11 @@
+#!/bin/sh
+APP=/usr/share/windsurf/resources/app "$@"
+exec @@ELEC@@ --app=${APP}
+
+# Progs below are never executed
+# Preliminaries for supporting e.g. --help
+# Maybe incorrect support for flags. Can I reuse /usr/bin/@@ELEC@@ ?
+eflags="${XDG_CONFIG_HOME:-$HOME/.config}/electron-flags.conf"
+eflags=$(sed 's/#.*//' "$eflags" | tr -s '[:space:]' ' ')
+# VSCode needs to classify cmdline flags e.g. --help
+ELECTRON_RUN_AS_NODE=1 exec /usr/lib/@@ELEC@@/electron ${APP}/out/cli.js $eflags --app=${APP} "$@"
