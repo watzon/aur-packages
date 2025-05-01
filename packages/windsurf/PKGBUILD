@@ -15,7 +15,6 @@ depends=( # electron is added at build time. Traslative deps by electron could b
     'expat'
     'fontconfig'
     'gcc-libs'
-    'glibc'
     'gnupg'
     'gtk3'
     'libdrm'
@@ -45,11 +44,12 @@ optdepends=('glib2: Needed for move to trash functionality'
             'icu69: Needed for live share' #no longer needed?
             'vulkan-driver')
 options=('!strip') # About 0.1MB strippable.
-# Is .sig file avaiable?
 source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${pkgver}.deb"
-'run.sh.in')
+		"https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/raw/main/code.sh"
+		'run.sh.in')
 sha256sums=('0d1bf6aaf7145383d366d87ae4926a74b5ee6b025b2e0e159a098111806dbcc5'
-'SKIP')
+			'5da1525b5fe804b9192c05e1cbf8d751d852e3717fb2787c7ffe98fd5d93e8c1'
+			'SKIP')
 package() {
     bsdtar -xf "data.tar.xz"
     # Get version of internal electron
@@ -58,10 +58,9 @@ package() {
     # Main resources
     install -d "${pkgdir}/usr/share/${pkgname}/resources/"
     mv "usr/share/${pkgname}/resources/app" "${pkgdir}/usr/share/${pkgname}/resources/app"
-    # Launcher
-    sed "s/@@ELEC@@/${_elbin}/g" run.sh.in > run.sh
+    # Launcher supports flag files
+    sed -e s/name=electron/name=${_elbin}/ -e s/code-flags/windsurf-flags/ code.sh | head -n -2 | cat - run.sh.in > run.sh
     install -Dm755 run.sh "${pkgdir}/usr/bin/${pkgname}"
-    # Symlink for desktop entries
     ln -sf "/usr/bin/${pkgname}" "${pkgdir}/usr/share/${pkgname}/${pkgname}"
     # Desktop entries
     mv usr/share/applications "${pkgdir}/usr/share/applications"
