@@ -48,8 +48,8 @@ source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/
 		"https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/raw/main/code.sh"
 		'run.sh.in')
 sha256sums=('0d1bf6aaf7145383d366d87ae4926a74b5ee6b025b2e0e159a098111806dbcc5'
-			'5da1525b5fe804b9192c05e1cbf8d751d852e3717fb2787c7ffe98fd5d93e8c1'
-			'SKIP')
+            '5da1525b5fe804b9192c05e1cbf8d751d852e3717fb2787c7ffe98fd5d93e8c1'
+            '32cd52025302ce8e5b0472cffca3c8df3b680c18fc3f36aa8f2c0cd3a0a18e31')
 package() {
 	bsdtar -xf "data.tar.xz" --exclude 'usr/share/windsurf/[^r]*' --exclude 'usr/share/windsurf/*.pak' \
 		--exclude 'usr/share/pixmaps' --exclude 'usr/share/windsurf/resources/completions'
