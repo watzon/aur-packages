@@ -38,11 +38,12 @@ depends=( # electron is added at build time. Traslative deps by electron could b
     'shared-mime-info'
     'xdg-utils'
 )
-optdepends=('glib2: Needed for move to trash functionality'
-            'org.freedesktop.secrets: Needed for settings sync'
-            'libdbusmenu-glib: Needed for KDE global menu'
-            'icu69: Needed for live share' #no longer needed?
-            'vulkan-driver')
+optdepends=('glib2: Move to trash functionality'
+            'org.freedesktop.secrets: Sync settings'
+            'libdbusmenu-glib: KDE global menu'
+            'icu69: Live share' # obsolete?
+            'vulkan-driver'
+            'electron: Run on latest electron')
 options=('!strip') # About 0.1MB strippable.
 source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${pkgver}.deb"
 		"https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/raw/main/code.sh"
@@ -62,7 +63,10 @@ package() {
 	# Launcher supports flag files
 	sed -e s/name=electron/name=${_elbin}/ -e s/code-flags/windsurf-flags/ code.sh | head -n -2 | cat - run.sh.in > run.sh
 	install -Dm755 run.sh usr/bin/windsurf
-	ln -sf /usr/bin/windsurf usr/share/windsurf/windsurf 
+	ln -sf /usr/bin/windsurf usr/share/windsurf/windsurf
+	# Launcher with latest electron (on inconvenience path since it is unsafe)
+	sed -e s/code-flags/windsurf-flags/ code.sh | head -n -2 | cat - run.sh.in > run.sh
+	install -Dm755 run.sh usr/share/windsurf/windsurf-electron-latest
 	# Icon (1024^2 is unusable at KDE)
 	install -Dm644 "usr/share/${pkgname}/resources/app/out/media/code-icon.svg" "usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
 	mv usr "${pkgdir}"
