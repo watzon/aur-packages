@@ -39,7 +39,7 @@ optdepends=('glib2: Move to trash functionality'
             'icu69: Live share' # obsolete?
             'vulkan-driver'
             'electron: /usr/share/windsurf/windsurf-latestron')
-options=('!strip') # About 0.1MB strippable.
+options=('!strip') # About 0.49MB strippable.
 makedepends=('tar') # faster than bsdtar.
 source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${pkgver}.deb"
 		"https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/raw/main/code.sh")
@@ -68,7 +68,7 @@ package() {
 	ln -sf /usr/bin/windsurf usr/share/windsurf/windsurf
 	# Replacements
 	_bin=usr/share/windsurf/resources/app/extensions/windsurf/bin/fd
-	rm ${_bin}.LICENSE # if rg was removed, detected as failure
+	rm ${_bin}.LICENSE # if fd was removed, detected as failure
 	ln -sf /usr/bin/fd ${_bin}
 	_bin=usr/share/windsurf/resources/app/node_modules/@vscode/ripgrep/bin/rg
 	${_bin} -V > /dev/null # if rg was removed, detected as failure
