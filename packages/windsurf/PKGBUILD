@@ -40,7 +40,7 @@ optdepends=('glib2: Move to trash functionality'
             'vulkan-driver'
             'electron: /usr/share/windsurf/windsurf-latestron')
 options=('!strip') # About 0.49MB strippable.
-makedepends=('tar') # faster than bsdtar.
+makedepends=('tar' 'sed') # tar is faster than bsdtar.
 source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${pkgver}.deb"
 		"https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/raw/main/code.sh")
 sha256sums=('0d1bf6aaf7145383d366d87ae4926a74b5ee6b025b2e0e159a098111806dbcc5'
@@ -49,9 +49,9 @@ package() {
 	tar -xf "data.tar.xz" --exclude 'usr/share/windsurf/[^r]*' --exclude 'usr/share/windsurf/*.pak' \
 		--exclude 'usr/share/pixmaps'
  	# Check version of electron
- 	_correctron=$(grep -E '"electron": "[0-9]{2}' usr/share/windsurf/resources/app/package.json|awk '{print $2}'|cut -c2-3)
+	_correctron=$(rg -o '"electron":\s*"[0-9]+' usr/share/windsurf/resources/app/package.json |rg -o '[0-9]+')
 	if [[ $_elnum != $_correctron ]]; then
-		echo "Using incorrectron. Change electron${_elnum} to electron${_correctron}"
+		echo "Incorrectron! Change electron${_elnum} to electron${_correctron}"
 		exit 1
 	fi
 	# Fix path
@@ -67,12 +67,12 @@ package() {
 	install -Dm755 run-safe.sh usr/bin/windsurf
 	ln -sf /usr/bin/windsurf usr/share/windsurf/windsurf
 	# Replacements
-	_bin=usr/share/windsurf/resources/app/extensions/windsurf/bin/fd
-	rm ${_bin}.LICENSE # if fd was removed, detected as failure
-	ln -sf /usr/bin/fd ${_bin}
-	_bin=usr/share/windsurf/resources/app/node_modules/@vscode/ripgrep/bin/rg
-	${_bin} -V > /dev/null # if rg was removed, detected as failure
-	ln -sf /usr/bin/rg ${_bin}
+	_fd=usr/share/windsurf/resources/app/extensions/windsurf/bin/fd
+	rm ${_fd}.LICENSE # unexistence is detected as failure
+	ln -svf /usr/bin/fd ${_fd}
+	_rgdir=usr/share/windsurf/resources/app/node_modules/@vscode/ripgrep
+	rm ${_rgdir}/LICENSE # unexistence is detected as failure
+	ln -svf /usr/bin/rg ${_rgdir}/bin/rg
 	# Icon (1024^2 is unusable at KDE)
 	install -Dm644 "usr/share/${pkgname}/resources/app/out/media/code-icon.svg" "usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
 	mv usr "${pkgdir}"
