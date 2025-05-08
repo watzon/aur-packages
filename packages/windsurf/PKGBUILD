@@ -2,7 +2,7 @@
 
 pkgname=windsurf
 pkgver=1.8.2
-pkgrel=1
+pkgrel=2
 pkgdesc="The new purpose-built IDE to harness magic"
 arch=('x86_64')
 url="https://windsurf.com/"
