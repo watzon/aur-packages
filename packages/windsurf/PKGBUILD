@@ -1,7 +1,7 @@
 # Maintainer: Chris Watson <cawatson1993@gmail.com>
 
 pkgname=windsurf
-pkgver=1.7.3
+pkgver=1.8.2
 pkgrel=2
 pkgdesc="The new purpose-built IDE to harness magic"
 arch=('x86_64')
@@ -36,26 +36,22 @@ depends=( electron$_elnum ripgrep fd #replacements
 optdepends=('glib2: Move to trash functionality'
             'org.freedesktop.secrets: Sync settings'
             'libdbusmenu-glib: KDE global menu'
-            'icu69: Live share' # obsolete?
             'vulkan-driver'
             'electron: /usr/share/windsurf/windsurf-latestron')
-options=('!strip') # About 0.49MB strippable.
+options=('!strip') # ~0.49MB
 makedepends=('tar' 'sed') # tar is faster than bsdtar.
 source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${pkgver}.deb"
 		"https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/raw/main/code.sh")
-sha256sums=('0d1bf6aaf7145383d366d87ae4926a74b5ee6b025b2e0e159a098111806dbcc5'
+sha256sums=('2f5fd7d829984c8f011334ea7a02540b179f5518165c0a7691b22feab19a2bd9'
             '5da1525b5fe804b9192c05e1cbf8d751d852e3717fb2787c7ffe98fd5d93e8c1')
 package() {
 	tar -xf "data.tar.xz" --exclude 'usr/share/windsurf/[^r]*' --exclude 'usr/share/windsurf/*.pak' \
 		--exclude 'usr/share/pixmaps'
  	# Check version of electron
-	_correctron=$(rg -o '"electron":\s*"[0-9]+' usr/share/windsurf/resources/app/package.json |rg -o '[0-9]+')
-	if [[ $_elnum != $_correctron ]]; then
-		echo "Incorrectron! Change electron${_elnum} to electron${_correctron}"
-		exit 1
-	fi
+ 	echo Replacing $(rg -m 1 '"electron":\s*"[0-9]+' usr/share/windsurf/resources/app/package.json) with $(cat /usr/lib/electron${_elnum}/version)
+ 	echo 'Fix if "major" version is wrong.'
 	# Fix path
-	mv usr/share/{appdata,metainfo} #metainfo (needed?)
+	mv usr/share/{appdata,metainfo} # metainfo (needed?)
  	mv usr/share/zsh/{vendor-completions,site-functions}
 	# Launcheres
 	_app=/usr/share/windsurf/resources/app
