@@ -6,7 +6,7 @@ pkgrel=1
 pkgdesc="The new purpose-built IDE to harness magic"
 arch=('x86_64')
 url="https://windsurf.com/"
-license=('custom') # should be fixed
+license=('LicenseRef-Windsurf Editor')
 _elnum=34
 depends=( electron$_elnum ripgrep fd #replacements
     'alsa-lib'
@@ -55,6 +55,11 @@ package() {
 	ln -svf /usr/bin/rg usr/share/windsurf/resources/app/node_modules/@vscode/ripgrep/bin/rg
 	# Icon (1024^2 is unusable at KDE)
 	install -Dm644 "usr/share/${pkgname}/resources/app/out/media/code-icon.svg" "usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
+ 	# License
+	install -d usr/share/licenses/${pkgname}
+	mv -v usr/share/${pkgname}/resources/app/LICENSE.txt usr/share/licenses/${pkgname}/LICENSE
+	mv -v usr/share/${pkgname}/resources/app/ThirdPartyNotices.txt usr/share/licenses/${pkgname}/
+	# Hide URL Handler
 	_url_handler_f="usr/share/applications/windsurf-url-handler.desktop";
 	grep -q '^Hidden=true' "$_url_handler_f" || \
 	  grep -q '^Hidden=false' "$_url_handler_f" && sed -i 's/^Hidden=false/Hidden=true/' "$_url_handler_f" || \
