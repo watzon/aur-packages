@@ -24,8 +24,7 @@ depends=( electron$_elnum ripgrep fd #replacements
 optdepends=('glib2: Move to trash functionality'
             'org.freedesktop.secrets: Sync settings'
             'libdbusmenu-glib: KDE global menu'
-            'vulkan-driver'
-            'electron: /usr/share/windsurf/windsurf-latestron')
+            'vulkan-driver')
 options=('!strip') # ~0.49MB
 makedepends=('tar' 'sed') # tar is faster than bsdtar.
 source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${pkgver}.deb"
@@ -43,12 +42,11 @@ package() {
  	mv usr/share/zsh/{vendor-completions,site-functions}
 	# Launcheres
 	_app=/usr/share/windsurf/resources/app
-	sed -e "s|code-flags|windsurf-flags|" code.sh \
+	sed -e "s|code-flags|windsurf-flags|" \
 		-e "s|/usr/lib/code/out/cli.js|${_app}/out/cli.js|" \
-		-e "s|/usr/lib/code/code.mjs|--app=${_app}|" > run.sh
-	sed "s|name=electron|name=electron${_elnum}|" run.sh > run-safe.sh
-	install -Dm755 run.sh usr/share/windsurf/windsurf-latestron
-	install -Dm755 run-safe.sh usr/bin/windsurf
+		-e "s|/usr/lib/code/code.mjs|--app=${_app}|" \
+		-e "s|name=electron|name=electron${_elnum}|" code.sh > run.sh
+	install -Dm755 run.sh usr/bin/windsurf
 	ln -sf /usr/bin/windsurf usr/share/windsurf/windsurf
 	# Replacements
 	ln -svf /usr/bin/fd usr/share/windsurf/resources/app/extensions/windsurf/bin/fd
