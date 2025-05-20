@@ -16,9 +16,7 @@ depends=( electron$_elnum ripgrep fd #replacements
     'libsecret'
     'libxkbfile'
     'libxss'
-    'libxtst'
     'lsof'
-    'shared-mime-info'
     'xdg-utils'
 )
 optdepends=('glib2: Move to trash functionality'
