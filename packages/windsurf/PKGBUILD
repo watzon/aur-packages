@@ -57,6 +57,8 @@ package_windsurf(){
 	pkgdesc="The new purpose-built IDE to harness magic"
 	cp -r --reflink=auto usr "${pkgdir}/usr"
 	install -Dm755 run-safe.sh "${pkgdir}/usr/bin/windsurf"
+ 	# redefine is needed
+ 	_electron=electron$(rg -o -r '$1' '"electron": *"[^0-9]*([0-9]+)' usr/share/windsurf/resources/app/package.json)
 	depends+=(${_electron}) # hidden from --printsrcinfo
 }
 
