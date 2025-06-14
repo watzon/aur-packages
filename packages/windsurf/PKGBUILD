@@ -20,7 +20,8 @@ optdepends=('glib2: Move to trash functionality'
             'org.freedesktop.secrets: Sync settings'
             'libdbusmenu-glib: KDE global menu'
             'lsof: Terminal splitting'
-            'vulkan-driver')
+            'vulkan-driver'
+            'code: Use extensions at code-oss')
 options=('!strip') # for sing of ext ?
 makedepends=(tar sed desktop-file-utils) # tar is faster than bsdtar.
 source=("https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/w/windsurf/Windsurf-linux-x64-${pkgver}.deb"
@@ -46,6 +47,11 @@ build() {
 	install -Dm644 "usr/share/${pkgname}/resources/app/out/media/code-icon.svg" "usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
 	# Hide entry of URL handler
 	desktop-file-edit --set-key Hidden --set-value true usr/share/applications/windsurf-url-handler.desktop
+	# Port exts to code-oss
+	install -d usr/lib/code/extensions
+	for f in usr/share/windsurf/resources/app/extensions/windsurf*;do
+		ln -sv /$f  usr/lib/code/extensions/
+	done
 }
 
 package_windsurf(){
