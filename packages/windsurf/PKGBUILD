@@ -3,7 +3,7 @@
 pkgver=1.12.3
 pkgbase=windsurf
 pkgname=(windsurf{,-electron-latest})
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="https://windsurf.com/"
 license=('LicenseRef-Windsurf Editor')
