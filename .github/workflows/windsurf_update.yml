@@ -3,7 +3,7 @@ name: Update Windsurf AUR Package
 on:
   push:
     paths:
-      - 'packages/windsurf/PKGBUILD'
+      - "packages/windsurf/PKGBUILD"
     branches:
       - main
   workflow_dispatch:
@@ -22,7 +22,7 @@ jobs:
           echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Publish AUR package
-        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.2
         with:
           pkgname: windsurf
           pkgbuild: packages/windsurf/PKGBUILD
